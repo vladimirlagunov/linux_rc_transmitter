@@ -134,6 +134,7 @@ int send_message(const u32 message, const u8 bits, s32 repeat) {
     }
 
     while (repeat-- > 0) {
+        signal_delays_cursor = signal_delays;
         bit = 1;
         spin_lock_irqsave(&transmit_lock, irq_flags);
         gpio_set_value(gpio_pin, 0);
