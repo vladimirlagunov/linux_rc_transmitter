@@ -1,0 +1,5 @@
+rc-transmitter (0.1) unstable; urgency=medium
+
+  * Creates character device for sending signals
+
+ -- Vladimir Lagunov <lagunov.vladimir@gmail.com>  Thu, 15 Mar 2018 13:45:14 +0000

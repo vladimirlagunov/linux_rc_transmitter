@@ -1,0 +1,11 @@
+#!/bin/sh
+
+#DEBHELPER#
+
+case "$1" in
+    configure)
+        groupadd --system --force rc-transmitter
+        ;;
+esac
+
+exit 0

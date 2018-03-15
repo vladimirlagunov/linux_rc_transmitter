@@ -1,0 +1,14 @@
+Source: rc-transmitter
+Section: unknown
+Priority: optional
+Maintainer: Vladimir Lagunov <lagunov.vladimir@gmail.com>
+Build-Depends: debhelper (>= 9), linux-headers, gcc, dkms
+Standards-Version: 3.9.8
+Homepage: https://github.com/werehuman/linux_rc_transmitter
+Vcs-Git: https://github.com/werehuman/linux_rc_transmitter
+Vcs-Browser: https://github.com/werehuman/linux_rc_transmitter
+
+Package: rc-transmitter
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, dkms, linux-headers
+Description: Send signals using RC transmitter connected to GPIO

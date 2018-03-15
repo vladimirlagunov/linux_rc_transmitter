@@ -1,0 +1,38 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+# dh_make generated override targets
+# This is example for Cmake (See https://bugs.debian.org/641051 )
+#override_dh_auto_configure:
+#	dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
+
+#include /usr/share/dpkg/default.mk
+
+DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+DEBVERS := $(shell dpkg-parsechangelog | grep ^Version: | cut -d' ' -f2 \
+	                | cut -d- -f1)
+VERSION := $(shell echo '$(DEBVERS)' | sed -e 's/[+-].*//' -e 's/~//g')
+
+DKMS_SRC_DIR := $(CURDIR)/debian/rc-transmitter/usr/src/rc-transmitter-$(VERSION)
+
+override_dh_dkms:
+	dh_dkms -V $(VERSION)
+
+override_dh_auto_install:
+	install -d $(DKMS_SRC_DIR)
+	cp -a dkms.conf src/* $(DKMS_SRC_DIR)
+	dh_auto_install
+
+%:
+	dh $@ --with dkms

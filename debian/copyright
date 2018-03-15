@@ -1,0 +1,7 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: rc-transmitter
+Source: https://github.com/werehuman/linux_rc_transmitter 
+
+Files: *
+Copyright: 2018 Vladimir Lagunov <lagunov.vladimir@gmail.com>
+License: GPL-2+

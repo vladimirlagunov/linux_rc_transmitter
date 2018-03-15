@@ -8,7 +8,7 @@
 #include <linux/errno.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
-#include "rc_transmitter.h"
+#include "rc-transmitter.h"
 
 module_param(gpio_pin, uint, 0);
 

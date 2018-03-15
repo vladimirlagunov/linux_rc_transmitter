@@ -1,0 +1,2 @@
+KERNEL=="rc_transmitter", \
+  OWNER="root", GROUP="rc-transmitter", MODE="0220"

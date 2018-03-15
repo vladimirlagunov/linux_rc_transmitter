@@ -1,15 +1,16 @@
 # -*- GNUMakefile -*-
 .DELETE_ON_ERROR:
-KDIR := /lib/modules/$(shell uname -r)/build
+KVERSION ?= $(shell uname -r)
+KDIR := /lib/modules/$(KVERSION)
 PWD := $(shell pwd)
-TARGET = rc_transmitter
+TARGET = rc-transmitter
 
 obj-m := $(TARGET).o
 
 ccflags-y += -Werror -Wall
 
 default:
-	$(MAKE) -C $(KDIR) M=$(PWD) modules
+	$(MAKE) -C $(KDIR)/build M=$(PWD) modules
 
 clean:
 	@rm -f *.o .*.cmd .*.flags *.mod.c *.order
