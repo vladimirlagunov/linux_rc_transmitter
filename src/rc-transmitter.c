@@ -103,12 +103,11 @@ module_exit(examplemod_exit);
 
 int send_message(const u32 message, const u8 bits, s32 repeat) {
     unsigned long irq_flags;
-    u32 last_signal_delay;
     u32* signal_delays;
     u32* signal_delays_cursor;
     u32* signal_delays_end;
-    ktime_t next_time, start_time, end_time, current_time;
-    const size_t signal_delays_count = bits * 2 + 1;
+    ktime_t next_time, start_time, current_time;
+    const size_t signal_delays_count = bits * 2 + 2;
     u32 message_copy = message;
     int bit;
     if (0 == bits) {
@@ -118,8 +117,8 @@ int send_message(const u32 message, const u8 bits, s32 repeat) {
     if (NULL == signal_delays) {
         return -ENOMEM;
     }
-    last_signal_delay = SYNC_BIT_LOW_PULSES * PULSE_LENGTH_MICROS;
     signal_delays_cursor = signal_delays_end = signal_delays + signal_delays_count;
+    *--signal_delays_cursor = SYNC_BIT_LOW_PULSES * PULSE_LENGTH_MICROS;
     *--signal_delays_cursor = SYNC_BIT_HIGH_PULSES * PULSE_LENGTH_MICROS;
     while (signal_delays_cursor > signal_delays) {
         bit = message_copy & 1;
@@ -133,10 +132,10 @@ int send_message(const u32 message, const u8 bits, s32 repeat) {
         message_copy >>= 1;
     }
 
+    spin_lock_irqsave(&transmit_lock, irq_flags);
     while (repeat-- > 0) {
         signal_delays_cursor = signal_delays;
         bit = 1;
-        spin_lock_irqsave(&transmit_lock, irq_flags);
         gpio_set_value(gpio_pin, 0);
         start_time = next_time = ktime_get_boottime();
         while (true) {
@@ -151,11 +150,9 @@ int send_message(const u32 message, const u8 bits, s32 repeat) {
                 ++signal_delays_cursor;
             }
         }
-        gpio_set_value(gpio_pin, 0);
-        spin_unlock_irqrestore(&transmit_lock, irq_flags);
-        usleep_range((u64) last_signal_delay, (u64) last_signal_delay + (PULSE_LENGTH_MICROS));
-        end_time = ktime_get_boottime();
     }
+    gpio_set_value(gpio_pin, 0);
+    spin_unlock_irqrestore(&transmit_lock, irq_flags);
     kfree(signal_delays);
     return 0;
 }
@@ -182,7 +179,8 @@ static ssize_t device_write(struct file * file_ptr, const char * buffer, size_t 
         return -EINVAL;
     }
 
-    printk(KERN_NOTICE "send_message(%u, %u, %u)\n", message, (u8)bits, repeat);
+    printk(KERN_NOTICE "send_message(%u, %u, %u) start\n", message, (u8)bits, repeat);
     send_message(message, (u8)bits, repeat);
+    printk(KERN_NOTICE "send_message(%u, %u, %u) end\n", message, (u8)bits, repeat);
     return buffer_length;
 }
